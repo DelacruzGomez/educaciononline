@@ -18,13 +18,15 @@ export async function handler(event, context) {
       };
     }
 
+    // URL oficial con el parámetro de autenticación explícito
     const url = `https://googleapis.com{apiKey}`;
 
     // Ejecutar llamada utilizando la API global nativa de Node.js estable
     const res = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey // 🔥 Añadimos la clave larga explícitamente en los headers para asegurar compatibilidad
       },
       body: payload
     });

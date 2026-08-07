@@ -717,59 +717,60 @@ Columna 2 */}
       </button>
 
 
-      {/* 🖥️ VENTANA FLOTANTE DEL CHAT (MODAL CON IFRAME) */}
-      {isChatOpen && (
-        <div style={{
-          position: 'fixed',
-          bottom: '90px', // Se posiciona justo encima del botón
-          right: '25px',
-          width: '380px', // Ancho ideal para un chat de soporte en web
-          height: '500px', // Altura perfecta para que sea cómodo de usar
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          boxShadow: '0px 10px 25px rgba(0, 0, 0, 0.25)',
-          zIndex: 10000,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          border: '1px solid #e2e8f0'
-        }}>
-          {/* Barra superior de la ventana del chat */}
-          <div style={{
-            backgroundColor: '#1e293b',
-            color: '#ffffff',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between' // 🔥 Dejamos solo la propiedad válida
-          }}>
+{/* 🖥️ VENTANA FLOTANTE DEL CHAT (MODAL CON IFRAME COREGIDO Y RESPONSIVO) */}
+{isChatOpen && (
+  <div style={{
+    position: 'fixed',
+    bottom: '95px', // Se posiciona justo encima del botón
+    right: '25px',
+    width: '380px', // Ancho ideal para computadoras
+    maxWidth: 'calc(100vw - 50px)', // 👈 CLAVE 1: En celulares se encoge dejando 25px libres a cada lado
+    height: '500px', // Altura perfecta para PC
+    maxHeight: '70vh', // 👈 CLAVE 2: En celulares limita la altura para que el teclado de Android no lo tape
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0px 10px 25px rgba(0, 0, 0, 0.25)',
+    zIndex: 10000,
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    border: '1px solid #e2e8f0'
+  }}>
+    {/* Barra superior de la ventana del chat */}
+    <div style={{
+      backgroundColor: '#1e293b',
+      color: '#ffffff',
+      padding: '12px 16px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }}>
+      <span style={{ fontWeight: '600', fontSize: '14px' }}>🤖 Consultor Portal EducaDG</span>
+      {/* Botón para cerrar la ventana del chat */}
+      <button 
+        onClick={() => setIsChatOpen(false)}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: '#ffffff',
+          fontSize: '18px',
+          cursor: 'pointer',
+          padding: '0 5px'
+        }}
+      >
+        ✕
+      </button>
+    </div>
 
-            <span style={{ fontWeight: '600', fontSize: '14px' }}>🤖 Consultor Portal EducaDG</span>
-            {/* Botón para cerrar la ventana del chat */}
-            <button 
-              onClick={() => setIsChatOpen(false)} // 🔥 Cierra la ventana
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#ffffff',
-                fontSize: '18px',
-                cursor: 'pointer',
-                padding: '0 5px'
-              }}
-            >
-              ✕
-            </button>
-          </div>
+    {/* Carga dinámicamente tu bot dentro de la landing page */}
+    <iframe 
+      src="/chat/asistente.html" 
+      style={{ width: '100%', height: 'calc(100% - 45px)', border: 'none' }}
+      title="Chatbot AI"
+    />
+  </div>
+)}
 
-{/* Carga dinámicamente tu bot dentro de la landing page */}
-<iframe 
-  src="/chat/asistente.html" 
-  style={{ width: '100%', height: 'calc(100% - 45px)', border: 'none' }} // 🔥 Ajuste de altura limpia
-  title="Chatbot AI"
-/>
-
-        </div>
-      )}
 
       {/* PIE DE PÁGINA LEGAL Y DE AUTORIDAD */}
       <footer className="catalog-footer" style={{ marginTop: '4rem', padding: '2rem 0', borderTop: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--gray)', textAlign: 'center', lineHeight: '1.6' }}>

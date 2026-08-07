@@ -47,14 +47,12 @@
         /* 3. Estilo para el contenedor del chat (la ventana que se abre) */
         #chatWindow {
             background-color: white;
-            border-radius: 1rem; /* Redondeamos un poco menos */
+            border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 350px; /* Tamaño máximo más estrecho para evitar invasión */
-            height: 450px; /* Altura más compacta */
-            margin-bottom: 10px;
+            width: 100%; /* Ocupa el 100% del iframe donde se monta */
+            height: 100%; /* Sigue el alto asignado por el iframe */
             display: none; 
-            flex-direction: column; /* Asegura que el contenido interno se apile */
+            flex-direction: column;
             overflow: hidden;
             transform: scale(0.9);
             opacity: 0;

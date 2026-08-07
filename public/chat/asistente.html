@@ -159,6 +159,18 @@
 
 
     <script>
+        // Escuchar el saludo inicial seguro enviado desde App.jsx de React
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'INIT_CHAT') {
+        // Evita duplicar el saludo si el historial ya contiene datos
+        if (messageArea.children.length === 0) {
+            addMessage(event.data.text, 'model');
+            conversationHistory = [];
+            conversationHistory.push({ role: 'model', text: event.data.text });
+        }
+    }
+});
+
         // Variables de Configuración
         // Variables de Configuración Seguras (Bypass GitHub & Netlify Proxy)
         const sector1 = "/.net";
@@ -188,73 +200,107 @@
               * Filtro y recomendación exclusiva de cursos con certificación y alta salida laboral.
               * Asesoramiento cercano para elegir el curso perfecto.
               * Aprendizaje flexible: estudias a tu propio ritmo, sin horarios fijos.
-              * Transparencia total: acceso directo a temarios oficiales y clases gratuitas.
+              * Transparencia total: acceso directo a temarios oficiales y Pasarela de Pagos.
 
             **SERVICIOS Y CURSOS DISPONIBLES:**
 
             *Desarrollo y Tecnología:*
-            - Programación Web y Multiplataforma: HTML, CSS, JavaScript, desarrollo de apps/videojuegos desde cero. Doble certificación.
-            - Programación Básica + Avanzada: Lógica de programación aplicada al sector financiero, banca, seguros y emprendimientos.
+            - Aprende Cómo Crear Apps de Éxito Sencillas ¡Sin Programar!: Creación y monetización de aplicaciones sin inversión y sin código.
             - Apps Rentables (No-Code): Crear aplicaciones de entretenimiento y monetizarlas con anuncios sin programar.
-            - Programación Web ISE: Formación completa en desarrollo web con enfoque práctico y profesional.
-            - Hacking Ético desde Cero: Introducción práctica a seguridad informática y ciberseguridad.
-            - Negocios Digitales con IA (Máster): Crear y escalar negocios digitales usando inteligencia artificial.
-            - eBook: Negocio Digital desde Cero - Guía práctica para iniciar tu primer negocio digital.
-            - eBook: Negocios Digitales (Marketing y Finanzas) - Estrategias de marketing digital y gestión financiera.
+            - Programación Básica + Avanzada: Fundamentos prácticos aplicados al sector financiero, bancario, de seguros y emprendimientos.
+            - Curso de Programación Inicial: El pilar esencial para aprender a programar hoy en día.
+            - Curso de Programación Web (ISE): Formación online estructurada para conseguir empleos tecnológicos bien pagados de forma rápida.
+            - Programación Web y Multiplataforma: Software seguro, diseño de videojuegos y apps de alta calidad.
+            - Hacking Ético desde Cero: Configuración de laboratorios propios con herramientas de ciberseguridad gratuitas.
+            - Negocios Digitales con IA (Máster): Automatización, YouTube, influencers de IA y agencias de Copywriting.
+            - eBook: Negocio Digital desde Cero: Guía práctica sobre validación de ideas y tiendas virtuales.
+            - eBook: Negocios Digitales (Marketing y Finanzas): Estrategias complementarias de marketing y gestión financiera.
 
             *Oficios:*
-            - Reparación de Celulares: Curso técnico para reparar smartphones desde cero.
-            - Diseña y Crea con Resina: Formación en productos con resina epóxica, técnicas profesionales y proyectos prácticos.
-            - Jabones y Velas Artesanales 2x1: Productos artesanales de cuidado personal. Promoción dos cursos en uno.
-            - Master Barber Pro: Curso profesional de barbería con técnicas modernas.
-            - Toca Piano Fácil desde Cero: Método simplificado para aprender piano sin conocimientos previos.
-            - Cosmetología Profesional: Formación completa en cosmetología.
-            - Manicura: Curso profesional de técnicas de manicura.
+            - Reparación de Celulares: Servicio técnico y diagnóstico de smartphones desde cero.
+            - Diseña y Crea con Resina (PRO): Elaboración de llaveros, tazas, joyería y agendas evitando errores de novato.
+            - Diseña y Crea con Resina (Curso Básico): Conceptos esenciales, proporciones y técnicas para las primeras piezas.
+            - Jabones y Velas Artesanales 2x1: Uso de bases orgánicas, aceites, cálculo de presupuestos y proveedores.
+            - Master Barber Pro: 21 cortes, colorimetría y administración de locales de la mano de un bicampeón mundial.
+            - Toca Piano Fácil desde Cero: Academia con posiciones de dedos, acordes, inversiones y círculos armónicos.
+            - Cosmetología Profesional: Técnicas profesionales de estética facial y cuidado de la piel.
+            - Manicura Profesional: Formación en técnicas modernas de cuidado y diseño de uñas.
 
             *Salud y Bienestar:*
-            - Sistema Yoga Restaurativo: Programa de yoga enfocado en restauración y bienestar físico-mental.
-            - Guía Estilo de Vida Saludable: Contenido práctico para adoptar hábitos saludables sostenibles.
-            - Programa Amor Propio y Autoestima: Formación en desarrollo personal, autoestima y amor propio (suscripción).
+            - Sistema Yoga Restaurativo: Método terapéutico de sesiones de 5 minutos contra dolores corporales y estrés.
+            - Guía Estilo de Vida Saludable: Plan integral de alimentación balanceada, rutinas en casa y relajación.
+            - Programa Amor Propio y Autoestima: Videos diarios y ejercicios guiados para fortalecer la confianza (Suscripción).
 
-            **CATÁLOGO DE CURSOS CON ENLACES DE AFILIADO:**
+            **CATÁLOGO DE CURSOS CON ENLACES DE AFILIADO DETALLADOS (HOTLINKS OFICIALES):**
 
             *Desarrollo y Tecnología:*
-            - Apps Rentables (No-Code): https://go.hotmart.com/R106772005H | Mensual ($67): https://go.hotmart.com/R106772005H?ap=3997
+            - Aprende Cómo Crear Apps de Éxito: https://go.hotmart.com/N106692793T
+            - Apps Rentables (No-Code):
+              * Link Principal / Pago Único: https://go.hotmart.com/R106772005H
+              * Plan Mensual ($67): https://go.hotmart.com/R106772005H?ap=3997
+              * MasterClass Secreta (Los Secretos Appers): https://go.hotmart.com/R106772005H?ap=9c1a
+              * Transmisiones en VIVO (Facebook Live): https://go.hotmart.com/R106772005H?ap=d4d9
+              * Pasos para Entender el Negocio: https://go.hotmart.com/R106772005H?ap=ebcb
+              * Checkout Directo Pago Único ($297): https://go.hotmart.com/R106772005H?ap=f701
+              * Serie Secreta Video #1 (Oferta 6 Días): https://go.hotmart.com/R106772005H?ap=8b6a
+              * Serie Secreta Video #2 (Oferta 6 Días): https://go.hotmart.com/R106772005H?ap=1195
+              * Serie Secreta Video #3 (Oferta 6 Días): https://go.hotmart.com/R106772005H?ap=8e23
             - Programación Básica + Avanzada: https://go.hotmart.com/N106772659G
-            - Programación Web ISE: https://go.hotmart.com/P106773049T
+            - Curso de Programación Inicial (Complemento): https://go.hotmart.com/P106856562N
+            - Programación Web ISE:
+              * Enlace de Ventas General: https://go.hotmart.com/P106773049T
+              * Página Oficial en Hotmart: https://go.hotmart.com/P106773049T?dp=1
+              * Página Externa del Programa: https://go.hotmart.com/P106773049T?ap=10b8
+              * Checkout Inscripción Rápida: https://go.hotmart.com/P106773049T?ap=4c83
+              * Checkout Pago de Contado Total: https://go.hotmart.com/P106773049T?ap=7c17
             - Programación Web y Multiplataforma: https://go.hotmart.com/Y106855907W
             - Hacking Ético desde Cero: https://go.hotmart.com/F106792904G
-            - Negocios Digitales con IA: https://go.hotmart.com/M106859320X
+            - Negocios Digitales con IA (Máster): https://go.hotmart.com/M106859320X
             - eBook Negocio Digital desde Cero: https://go.hotmart.com/E106805690P
             - eBook Negocios Digitales (Marketing y Finanzas): https://go.hotmart.com/F106858942V
 
             *Oficios:*
             - Reparación de Celulares: https://go.hotmart.com/O106772582N
-            - Diseña y Crea con Resina: https://go.hotmart.com/C106809529R | Descuento: https://go.hotmart.com/C106809529R?ap=1d28 | Temario: https://go.hotmart.com/S106801999T
+            - Diseña y Crea con Resina (PRO):
+              * Venta General: https://go.hotmart.com/C106809529R
+              * Lanzamiento Oficial ($37): https://go.hotmart.com/C106809529R?ap=1d28
+              * Clase Gratuita Día #1: https://go.hotmart.com/C106809529R?ap=3a88
+              * Clase Gratuita Día #2: https://go.hotmart.com/C106809529R?ap=8101
+              * Tarifa Especial EE.UU. ($37): https://go.hotmart.com/C106809529R?ap=18eb
+              * Oferta Flash Limitada ($30): https://go.hotmart.com/C106809529R?ap=8b35
+              * Descuento Intermedio ($47): https://go.hotmart.com/C106809529R?ap=b12e
+              * Cupón Especial ($55): https://go.hotmart.com/C106809529R?ap=8124
+              * Acceso Premium Full ($74): https://go.hotmart.com/C106809529R?ap=93c6
+            - Diseña y Crea con Resina (Curso Básico):
+              * Venta General Básico: https://go.hotmart.com/S106801999T
+              * Opción Principal ($25): https://go.hotmart.com/S106801999T?ap=b65b
+              * Oferta Mínima Curso Básico ($20): https://go.hotmart.com/S106801999T?ap=0e44
             - Jabones y Velas Artesanales 2x1: https://go.hotmart.com/O106861041A
-            - Master Barber Pro: https://go.hotmart.com/G106801786P
+            - Master Barber Pro https://go.hotmart.com/G106801786P
             - Toca Piano Fácil desde Cero: https://go.hotmart.com/A106864024O?dp=1
-            - Cosmetología Profesional: https://go.hotmart.com/U106873037M
-            - Manicura: https://go.hotmart.com/Q106873316P
+            - Especialidades Estéticas (Cosmetología + Manicura):
+              * Enlace Cosmetología Profesional: https://go.hotmart.com/U106873037M
+              * Enlace Manicurista Profesional: https://go.hotmart.com/Q106873316P
 
             *Salud y Bienestar:*
             - Sistema Yoga Restaurativo: https://go.hotmart.com/G106772402F
             - Guía Estilo de Vida Saludable: https://go.hotmart.com/O106802124X
             - Programa Amor Propio y Autoestima: https://go.hotmart.com/W106802341H
 
-            **REGLAS DE ENVÍO DE LINKS:**
+            **REGLAS DE ENVÍO DE LINKS (ESTRICTAS):**
             - Si el usuario pregunta por un curso específico, envía el link principal de la tabla correspondiente.
-            - Si pregunta por promociones o descuentos, prioriza los links de descuento o temario (ejemplo: Resina tiene link de descuento y temario aparte).
-            - Si pregunta por Apps Rentables, ofrece ambas opciones: Pago único (https://go.hotmart.com/R106772005H) y Mensual $67 (https://go.hotmart.com/R106772005H?ap=3997).
-            - Si pregunta por Cosmetología o Manicura, ofrece ambos links por separado: Cosmetología (https://go.hotmart.com/U106873037M) y Manicura (https://go.hotmart.com/Q106873316P).
-            - Si pregunta por eBooks de Negocio Digital, ofrece ambas opciones: Desde Cero (https://go.hotmart.com/E106805690P) y Marketing y Finanzas (https://go.hotmart.com/F106858942V).
-
+            - Si pregunta por promociones, cupones o descuentos de Resina PRO, ofrece el enlace de Lanzamiento Oficial $37 (https://go.hotmart.com/C106809529R?ap=1d28) o la Oferta Flash $30 (https://go.hotmart.com/C106809529R?ap=8b35).
+            - Si pide clases gratuitas de Resina, entrégale los accesos del Día #1 (https://go.hotmart.com/C106809529R?ap=3a88) y Día #2 (https://go.hotmart.com/C106809529R?ap=8101).
+            - Si pregunta por Apps Rentables, ofrece de manera obligatoria el Pago único (https://go.hotmart.com/R106772005H) y el Plan Mensual de $67 (https://go.hotmart.com/R106772005H?ap=3997). Si quiere el descuento directo del pago único envíale el link de $297 (https://go.hotmart.com/R106772005H?ap=f701).
+            - Si se interesa en Programación Básica + Avanzada (https://go.hotmart.com/N106772659G), añade obligatoriamente la alternativa recomendada del "Curso de Programación Inicial" (https://go.hotmart.com/P106856562N).
+            - Si pregunta por Cosmetología o Manicura, envía los enlaces correctos correspondientes por separado: Cosmetología Profesional (https://go.hotmart.com/U106873037M) y Manicurista Profesional (https://go.hotmart.com/Q106873316P).
+            - Si pregunta por eBooks de Negocio Digital, ofrece las dos opciones integradas: Desde Cero (https://go.hotmart.com/E106805690P) y Marketing y Finanzas (https://go.hotmart.com/F106858942V).
             **DATOS DE CONTACTO:**
             - WhatsApp / Teléfono: 930401372
             - Email: luisdgjun55@gmail.com
             - TikTok: @educadg
             - Instagram: @portaleducadg
-            - Facebook: facebook.com/portaleducadg
+            - Facebook: ://facebook.com
             - Dirección: Ayacucho (Atención y operaciones digitales)
             - Landing page: https://educaciononline.netlify.app
 
@@ -266,25 +312,41 @@
             - El chatbot resolverá de forma independiente el 100% de las dudas informativas, preguntas sobre temarios o metodologías.
             - Solo si el usuario confirma explícitamente que desea realizar la contratación/inscripción de un curso, se le derivará a soporte humano (930401372).
 
-            **PREGUNTAS FRECUENTES:**
-            - ¿Cuánto tarda el acceso al curso? El acceso es inmediato tras el pago. Los datos de ingreso llegan al correo electrónico.
-            - ¿Formas de pago? Efectivo (puntos de pago autorizados por Hotmart), transferencias bancarias, tarjetas de crédito/débito.
-            - ¿Cómo inscribirse? El chatbot guía para registro en la web. Si requiere asistencia humana exclusiva para inscripción o facturación, se deriva al 930401372.
+            **PREGUNTAS FRECUENTES (Úsalas para dar respuestas directas):**
+            - Acceso al curso: Es inmediato tras el pago. Los datos de ingreso llegan directo al correo electrónico.
+            - Formas de pago: Efectivo (puntos de pago autorizados por Hotmart), transferencias bancarias y tarjetas de crédito/débito.
+            - Cómo inscribirse: Guía al usuario para que se registre en la web. Si exige asistencia humana exclusiva para inscripción o facturación, derívalo al 930401372.
 
-            Responde de manera amigable, concisa y profesional. Usa emojis de forma moderada. Incluye los links completos cuando el usuario pregunte por un curso específico.
+            **ESTILO DE RESPUESTA Y FORMATO (ESTRICTO):**
+            - Responde de manera amigable, concisa y profesional. Usa emojis de forma muy moderada.
+            - Usa respuestas cortas y directas. Máximo 2 o 3 oraciones por mensaje para no aburrir al lector.
+            - Queda prohibido enviar listas gigantescas de enlaces. Entrega únicamente el link exacto que solucione la duda actual del usuario.
+            - Para que los enlaces sean CLICKEABLES, usa estrictamente el formato Markdown ocultando la URL larga detrás de un texto descriptivo.
+              * Ejemplo correcto: Puedes ver los detalles aquí: [Curso de Piano desde Cero](https://go.hotmart.com/A106864024O?dp=1).
+              * Nunca dejes la URL limpia expuesta (como https://hotmart.com...) ya que rompe la estética de la lectura.
+            - Usa negritas en palabras clave para facilitar un escaneo visual rápido.
         `;
+
 
         // Mensaje de Bienvenida
         const welcomeMessage = `Hola 👋 Soy el asistente virtual de Portal EducaDG. Estoy aquí para ayudarte a encontrar los mejores cursos online y programas ideales para llevar tu talento al siguiente nivel. 🚀 ¿En qué te puedo asesorar hoy?`;
         
-        // 2. Función para añadir mensajes al área de chat
+        // 2. Función para añadir mensajes al área de chat (CON DETECTOR DE ENLACES MARKDOWN)
         function addMessage(text, role) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add(
                 role === 'user' ? 'user-message' : 'bot-message',
                 'whitespace-pre-wrap'
             );
-            messageDiv.innerHTML = text; 
+
+            // Transforma [Texto](https://...) en un enlace HTML real clicable que abre en otra pestaña
+            // Añade estilos en línea para que resalte y se lea perfectamente sobre el fondo azul
+            let textoFormateado = text.replace(
+                /\[([^\]]+)\]\(([^)]+)\)/g, 
+                '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #ffffff; text-decoration: underline; font-weight: bold; cursor: pointer;">$1</a>'
+            );
+
+            messageDiv.innerHTML = textoFormateado; 
             messageArea.appendChild(messageDiv);
             
             if (text !== welcomeMessage && !text.startsWith("Escribiendo...")) {
@@ -324,103 +386,83 @@
             }
         }
         
-        // 5. Función principal para enviar el mensaje (VERSION ULTRA SEGURA ANTI-BLOQUEO)
-        async function sendMessage() {
-            const userText = userInput.value.trim();
-            if (userText === '') return;
+// 5. Función principal para enviar el mensaje (VERSIÓN ADAPTADA PARA PUENTE OPENROUTER)
+async function sendMessage() {
+    const userText = userInput.value.trim();
+    if (userText === '') return;
 
-            userInput.value = '';
-            userInput.disabled = true;
-            sendButton.disabled = true;
+    userInput.value = '';
+    userInput.disabled = true;
+    sendButton.disabled = true;
 
-            // Muestra en pantalla el mensaje del usuario
-            addMessage(userText, 'user');
+    // Muestra en pantalla el mensaje del usuario
+    addMessage(userText, 'user');
 
-            // IMPORTANTE: Guardamos el mensaje en el historial local antes de armar el payload
-            conversationHistory.push({ role: 'user', text: userText });
+    // Guardamos el mensaje en el historial local
+    conversationHistory.push({ role: 'user', text: userText });
 
-            // Prepara el historial en formato tradicional compatible con la API de contenidos
-            const payloadContents = conversationHistory.map(msg => ({
-                role: msg.role === 'user' ? 'user' : 'model', 
-                parts: [{ text: msg.text }]
-            }));
+    // Prepara el historial manteniendo compatibilidad con la estructura esperada por tu Netlify function
+    const payloadContents = conversationHistory.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model', 
+        parts: [{ text: msg.text }]
+    }));
 
-            const loadingIndicator = showLoading();
+    const loadingIndicator = showLoading();
 
-            try {
-                // 🔥 PAYLOAD SIMPLIFICADO PARA COMPATIBILIDAD CON CLAVES LARGAS DE GOOGLE CLOUD
-                // Dejamos únicamente los contenidos para evitar que el filtro estricto de la clave rechace la llamada
-                const payload = {
-                    contents: payloadContents
-                };
+    try {
+        const payload = {
+            contents: payloadContents
+        };
 
-                // Ruta alternativa libre de palabras clave bloqueadas
-                const uPath = "/.net" + "lify/func" + "tions/gem" + "ini";
-                const coreUrl = uPath;
+        // Ruta a tu función de Netlify
+        const coreUrl = "/.netlify/functions/gemini";
 
-                const maxRetries = 3;
-                let response = null;
+        const netOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+            // Quitamos las variables separadas innecesarias ya que OpenRouter procesa el System Prompt de forma segura en backend
+        };
 
-                
-                // Configuración modular de red invisible para el escáner estático
-                const netOptions = {
-                    method: 'P' + 'O' + 'S' + 'T',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                };
+        let response = await window.fetch(coreUrl, netOptions);
 
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await window.fetch(coreUrl, netOptions);
-
-                        if (response.ok) {
-                            break; 
-                        }
-                        throw new Error(`Error HTTP: ${response.status}`);
-                    } catch (error) {
-                        if (i === maxRetries - 1) throw error; 
-                    }
-                }
-
-                if (!response || !response.ok) {
-                    throw new Error("No se pudo obtener una respuesta del servidor.");
-                }
-
-                const result = await response.json();
-                
-                // Mapeo seguro para capturar el texto que Gemini responde en pantalla
-                const botResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Disculpa, no pude procesar tu solicitud. Intenta de nuevo.";
-                
-                // Quita la animación de "Escribiendo..."
-                if (loadingIndicator) {
-                    loadingIndicator.remove();
-                }
-                
-                // Dibuja el mensaje en la pantalla de chat
-                addMessage(botResponse, 'model'); 
-
-                // IMPORTANTE: Guardamos la respuesta del bot en el historial local para mantener el contexto de la conversación
-                conversationHistory.push({ role: 'model', text: botResponse });
-
-            } catch (error) {
-                console.error("Error al llamar a la API de Gemini:", error);
-                
-                // Quita el mensaje de historial del usuario si ocurrió un fallo físico
-                conversationHistory.pop(); 
-                
-                if (loadingIndicator) {
-                    loadingIndicator.remove();
-                }
-                
-                addMessage("Lo siento, hubo un error de conexión o del servidor. Por favor, intenta de nuevo.", 'model');
-            } finally {
-                userInput.disabled = false;
-                sendButton.disabled = false;
-                userInput.focus();
-            }
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
         }
 
+        const result = await response.json();
+        
+        // Mapeo seguro para capturar el texto procesado por OpenRouter que viene desde tu backend
+        const botResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Disculpa, no pude procesar tu solicitud. Intenta de nuevo.";
+        
+        // Quita la animación de "Escribiendo..."
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+        
+        // Dibuja el mensaje en la pantalla de chat
+        addMessage(botResponse, 'model'); 
 
+        // Guardamos la respuesta del bot en el historial local
+        conversationHistory.push({ role: 'model', text: botResponse });
+
+    } catch (error) {
+        console.error("Error al conectar con el backend de asistencia:", error);
+        
+        // Quita el mensaje de historial del usuario si ocurrió un fallo
+        conversationHistory.pop(); 
+        
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+        
+        addMessage("Lo siento, hubo un error de conexión con el asistente. Por favor, intenta de nuevo.", 'model');
+    } finally {
+        userInput.disabled = false;
+        sendButton.disabled = false;
+        userInput.focus();
+    }
+}
 
         
         document.addEventListener('DOMContentLoaded', () => {

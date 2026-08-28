@@ -521,3 +521,261 @@ body {
     background-position: 0% 50%;
   }
 }
+
+
+/* Contenedor Principal con fondo oscuro */
+.faq-section {
+  padding: 60px 40px; /* Ajustamos un poco el espaciado interno */
+  background-color: #0b0f19; /* Azul marino ultra oscuro profundo */
+  position: relative;
+  border-radius: 16px;       /* curvatura de tarjetas */
+  overflow: hidden;          /* Evita que el contenido interno se salga de la curva */
+  max-width: 1140px;         /* Centra el bloque en pantallas grandes */
+  margin: 40px auto;         /* Separa la sección de los bloques de arriba y abajo */
+}
+
+.faq-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Distribución en dos columnas para pantallas grandes */
+@media (min-width: 768px) {
+  .faq-container {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .faq-sidebar {
+    flex: 0 0 35%;
+    position: sticky;
+    top: 40px;
+    height: fit-content;
+  }
+  
+  .faq-content-box {
+    flex: 0 0 60%;
+  }
+}
+
+/* Columna Izquierda: Textos */
+.faq-tag {
+  color: #a855f7; /* Morado brillante de tu badge superior */
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.faq-title {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff; /* Texto blanco para resaltar sobre el fondo oscuro */
+  margin-bottom: 16px;
+}
+
+.faq-text {
+  font-size: 15px;
+  color: #94a3b8; /* Gris claro suave de alta legibilidad */
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.faq-email {
+  color: #3b82f6; /* Azul eléctrico de tus botones */
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed #3b82f6;
+}
+
+.faq-email:hover {
+  color: #a855f7;
+  border-bottom-color: #a855f7;
+}
+
+/* Fila de Redes Sociales */
+.faq-socials {
+  display: flex;
+  gap: 20px; /* Un poco más de espacio entre marcas */
+  margin-top: 16px;
+}
+/* Convierte cada enlace en una columna alineada al centro */
+.social-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px; /* Espacio entre el icono SVG y el texto */
+  text-decoration: none;
+  color: #94a3b8; /* Gris que combina con el texto */
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+/* Estilo para las etiquetas de texto de las redes */
+.social-name {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: inherit; /* Hereda el color dinámico del hover del icono */
+}
+
+.social-icon:hover {
+  transform: translateY(-3px);
+}
+/* Colores de hover oficiales para redes */
+.social-icon.face:hover { color: #1877f2; }
+.social-icon.inst:hover { color: #e1306c; }
+.social-icon.tiktok:hover { color: #ffffff; }
+
+/* Caja Derecha de Preguntas (Acordeón) */
+.faq-content-box {
+  background: #141b2d; /* Azul un toque más claro para hacer contraste */
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 8px 24px;
+}
+
+/* Cada bloque de pregunta */
+.faq-item {
+  border-bottom: 1px solid #1e293b;
+  padding: 22px 0;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-question {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff; /* Texto de la pregunta en blanco */
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.faq-question::-webkit-details-marker {
+  display: none; /* Quita flecha nativa en Safari */
+}
+
+/* Flecha personalizada */
+.faq-question::after {
+  content: '▼';
+  font-size: 10px;
+  color: #64748b;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Cambios cuando el acordeón se abre */
+.faq-item[open] .faq-question {
+  color: #3b82f6; /* Cambia al azul eléctrico al abrirse */
+}
+
+.faq-item[open] .faq-question::after {
+  transform: rotate(180deg);
+  color: #3b82f6; /* Flecha azul */
+}
+
+/* Bloque de texto de la respuesta */
+.faq-answer {
+  margin-top: 14px;
+  font-size: 15px;
+  color: #cbd5e1; /* Blanco hueso/gris muy claro para leer sin esfuerzo */
+  line-height: 1.6;
+}
+
+.social-icon.whats:hover { 
+  color: #25d366; 
+}
+
+
+/* Contenedor principal LOADING oscuro  */
+.loading-screen_neon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #010101;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+/* Contenedor del spinner optimizado y más pequeño */
+.neon-spinner-container {
+  position: relative;
+  width: 130px; /* Tamaño reducido de forma elegante */
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+/* El anillo SVG rota limpiamente sobre su propio eje */
+.neon-svg-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: neon-spin 1.4s linear infinite;
+  /* Brillo de neón de alta fidelidad */
+  filter: drop-shadow(0 0 5px #0099ff) drop-shadow(0 0 12px #0055ff);
+}
+
+/* Estilo para todos los puntos del vector */
+.neon-dots-group circle {
+  fill: #00d2ff;
+}
+
+/* Texto interno "LOADING" escalado al nuevo contenedor */
+.neon-loading-text-center {
+  color: #00b3ff;
+  font-size: 0.8rem; /* Más pequeño para encajar perfectamente dentro */
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 5px rgba(0, 179, 255, 0.8), 0 0 12px rgba(0, 85, 255, 0.5);
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* Mensajes institucionales inferiores */
+.loading-text_neon {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #00b3ff;
+  margin: 0;
+  text-align: center;
+  padding: 0 24px;
+  text-shadow: 0 0 6px rgba(0, 179, 255, 0.6), 0 0 15px rgba(0, 53, 255, 0.3);
+}
+
+.loading-subtext_neon {
+  font-size: 0.85rem;
+  color: #0077aa;
+  margin-top: 6px;
+  text-shadow: 0 0 4px rgba(0, 119, 170, 0.4);
+}
+
+/* Animaciones fluidas */
+@keyframes neon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}

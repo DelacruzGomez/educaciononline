@@ -1,312 +1,116 @@
 import { useEffect, useState } from 'react';
+// 📦 Importamos el cliente oficial local que instalamos desde tu terminal
+import { createClient } from '@supabase/supabase-js';
 import './App.css';
 
+// ⚙️ Credenciales de tu proyecto de Supabase
+const SUPABASE_URL = "https://iuygoavokzrqirwapqve.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1eWdvYXZva3pycWlyd2FwcXZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjMwMDcsImV4cCI6MjEwMjg5OTAwN30.ivf-iSXwp84YO9Qp7JTzKoB95wrzLJRHYFfzKmzftys";
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 export default function App() {
-  const hotmartUrl = 'https://go.hotmart.com/N106692793T'
-  const downloadUrl = 'https://educaciononline.netlify.app/gracias.html'
-    // 🔥 ESTADO PARA MOSTRAR/OCULTAR EL CHAT
-  // ESTADO PARA MOSTRAR/OCULTAR EL CHAT
+  const hotmartUrl = 'https://go.hotmart.com/N106692793T';
+  const downloadUrl = 'https://educaciononline.netlify.app/gracias.html';
+  
+  // ESTADOS DEL COMPONENTE
   const [isChatOpen, setIsChatOpen] = useState(false);
-    // 🔥 NUEVO ESTADO: Agrégalo justo aquí abajo
   const [openProductMenu, setOpenProductMenu] = useState(null);
+  
+  // 🔥 NUEVO ESTADO: Aquí se guardarán los productos dinámicos de la BD
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 📡 LLAMADA A SUPABASE AL CARGAR EL COMPONENTE
+  useEffect(() => {
+    async function obtenerProductosBD() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('cursos')
+          .select('*');
+
+        if (error) throw error;
+
+        // Si hay datos, actualizamos el catálogo en tiempo real
+        if (data) {
+          setRecommendedProducts(data);
+        }
+      } catch (err) {
+        console.error("Error cargando productos desde Supabase:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    obtenerProductosBD();
+  }, []);
 
   const toggleMenu = (productId) => {
     setOpenProductMenu(openProductMenu === productId ? null : productId);
   };
 
-   // 🔥 ESCUCHA CUANDO SE ABRE EL CHAT PARA ENVIAR EL MENSAJE DE BIENVENIDA DE FORMA SEGURA
+  // ESCUCHA CUANDO SE ABRE EL CHAT PARA ENVIAR EL MENSAJE DE BIENVENIDA
+  // 🚀 ESCUCHA OPTIMIZADA: Envía el saludo exacto al cargarse el iframe sin demoras ni cuelgues
   useEffect(() => {
     if (isChatOpen) {
-      // Damos un sutil retraso para asegurar que el iframe esté 100% cargado en el DOM
-      const timer = setTimeout(() => {
+      const enviarSaludoNativo = () => {
         const iframe = document.querySelector('iframe[title="Chatbot AI"]');
         if (iframe && iframe.contentWindow) {
           const saludo = "Hola 👋 Soy el asistente virtual de Portal EducaDG. Estoy aquí para ayudarte a encontrar los mejores cursos online y programas ideales para llevar tu talento al siguiente nivel. 🚀 ¿En qué especialización o curso te gustaría recibir información hoy?";
           
-          // Enviamos el saludo usando postMessage (Mecanismo ultra seguro y estandarizado)
+          // Enviamos el saludo usando el canal seguro postMessage
           iframe.contentWindow.postMessage({ type: 'INIT_CHAT', text: saludo }, '*');
         }
-      }, 300); // 300ms es el tiempo perfecto de sincronización
+      };
 
-      return () => clearTimeout(timer);
+      // Buscamos el iframe de forma inmediata en el DOM
+      const iframe = document.querySelector('iframe[title="Chatbot AI"]');
+      
+      if (iframe) {
+        // Si el iframe ya está en el DOM pero aún carga internamente, esperamos su evento onload
+        iframe.onload = enviarSaludoNativo;
+        
+        // Ejecución de respaldo por si el navegador ya lo tenía pre-renderizado en caché
+        enviarSaludoNativo();
+      }
     }
   }, [isChatOpen]);
 
 
-  // Productos organizados por categoría para estructurar el catálogo
-  const recommendedProducts = [
-    {
-      id: 3210423,
-      category: 'desarrollo',
-      title: '📱 Aprende Cómo Crear Apps de Éxito Sencillas ¡Sin Programar!',
-      description: 'Crea y monetiza aplicaciones móviles exitosas sin saber programar y con cero inversión. Aprende a encontrar nichos rentables, usar plataformas sencillas y dominar el marketing para maximizar tus descargas e ingresos.',
-      url: 'https://go.hotmart.com/N106692793T', // Página de ventas / Pago Único info
-      buttonText: '🔍 Ver Temario Completo',
-      badge: 'Principal',
-      image: 'https://static-media.hotmart.com/I3A_hyQNNxcQqzTH9LAZNOJVS8Y=/300x300/smart/filters:format(webp):background_color(white)/hotmart/product_pictures/8d18aa4a-d077-473a-842e-17573c8e2efe/App.png?w=920',
-    },
-    {
-      id: 226810,
-      category: 'desarrollo',
-      title: '📱 Apps Rentables',
-      description: 'El negocio de las aplicaciones ya no es exclusivo de ingenieros. Crea, monetiza tus propias apps móviles sencillas e inicia un negocio digital altamente rentable desde cero.',
-      url: 'https://go.hotmart.com/R106772005H', // Página de ventas / Pago Único info
-      urlMensual: 'https://go.hotmart.com/R106772005H?ap=3997', // Plan Mensual 67$
-      buttonText: '🔍 Ver Temario Completo',
-      badge: 'Principal',
-      // Se corrigió el enlace doble de la imagen dejando solo el de Hotmart
-      image: 'https://e0e8d87628.cbaul-cdnwnd.com/c7911eafbc364cef7af23daf60ec1a7b/200000037-22b6322b67/logo.webp?ph=e0e8d87628https://static-media.hotmart.com/2BK98Fr8qhtsmTNyB-SvsNvoelw=/filters:background_color(white)/hotmart/product_pictures/29d9014c-a295-49c8-bb5f-d851542e1a3a/ecoverappshotmart.png',
+  // Si está cargando los datos de Supabase, puedes mostrar un pequeño indicador opcional
+if (loading) {
+  return (
+    <div className="loading-screen_neon">
+      <div className="neon-spinner-container">
+        {/* SVG compacto con puntos de tamaño progresivo real */}
+        <svg className="neon-svg-ring" viewBox="0 0 100 100">
+          <g className="neon-dots-group">
+            {/* Puntos que crecen progresivamente en tamaño (Radio 'r' de menor a mayor) y opacidad */}
+            <circle cx="50" cy="10" r="0.8" opacity="0.10" />
+            <circle cx="70" cy="15" r="1.1" opacity="0.15" />
+            <circle cx="85" cy="30" r="1.4" opacity="0.22" />
+            <circle cx="90" cy="50" r="1.8" opacity="0.30" />
+            <circle cx="85" cy="70" r="2.2" opacity="0.40" />
+            <circle cx="70" cy="85" r="2.6" opacity="0.52" />
+            <circle cx="50" cy="90" r="3.1" opacity="0.65" />
+            <circle cx="30" cy="85" r="3.6" opacity="0.78" />
+            <circle cx="15" cy="70" r="4.2" opacity="0.90" />
+            <circle cx="10" cy="50" r="4.8" opacity="1.00" />
+          </g>
+        </svg>
+        {/* Texto central adaptado al nuevo tamaño pequeño */}
+        <span className="neon-loading-text-center">LOADING</span>
+      </div>
       
-      // Estructura de opciones extra idéntica a la categoría de oficios
-      tieneOpcionesExtra: true,
-      clases: [
-        { label: '📺 MasterClass Completa: Los Secretos Appers', url: 'https://go.hotmart.com/R106772005H?ap=9c1a' },
-        { label: '🎬 Transmisiones en VIVO (Facebook Live)', url: 'https://go.hotmart.com/R106772005H?ap=d4d9' },
-        { label: '📝 Pasos para Entender Apps Rentables', url: 'https://go.hotmart.com/R106772005H?ap=ebcb' }
-      ],
-      preciosAlternativos: [
-        { label: '💎 Checkout Directo Pago Único ($297)', url: 'https://go.hotmart.com/R106772005H?ap=f701' },
-        { label: '⏱️ Serie Secreta: Video #1 (Oferta 6 Días)', url: 'https://go.hotmart.com/R106772005H?ap=8b6a' },
-        { label: '⏱️ Serie Secreta: Video #2 (Oferta 6 Días)', url: 'https://go.hotmart.com/R106772005H?ap=1195' },
-        { label: '⏱️ Serie Secreta: Video #3 (Oferta 6 Días)', url: 'https://go.hotmart.com/R106772005H?ap=8e23' }
-      ]
-    },
+      {/* Mensajes inferiores institucionales */}
+      <h2 className="loading-text_neon">Cargando catálogo oficial de Portal EducaDG</h2>
+      <p className="loading-subtext_neon">Por favor, espera un momento...</p>
+    </div>
+  );
+}
 
-    {
-      id: 5959234, // Usa un solo número limpio para evitar fallos de sintaxis en el key de React
-      category: 'desarrollo',
-      title: '⚡ Mega Programación Básica + Avanzada',
-      description: 'Domina los fundamentos prácticos de la programación aplicados al sector financiero, bancario y de seguros. Aprende a tu ritmo con 7 unidades claras, casos reales y videos explicativos para impulsar tu negocio o carrera.',
-      url: 'https://go.hotmart.com/N106772659G', // Página Principal (Boton Gris)
-      buttonText: '💻 Programación Básica + Avanzada',
-      badge: 'Útil',
-      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
-      
-      // 🔥 Propiedades corregidas para que hagan match con tu JSX
-      urlExtra: 'https://go.hotmart.com/P106856562N',
-      buttonTextExtra: '🔍 Ver Curso de Programación Inicial',
+  // A partir de aquí sigue el bloque de tu return() con el diseño de tus tarjetas tradicionales...
 
-      // Dejado preparado para la lógica de pestañas desplegables si deseas usarla más adelante
-      tieneOpcionesExtra: false, 
-      clases: [],
-      preciosAlternativos: []
-    },
-
-    {
-      id: 2373674,
-      category: 'desarrollo',
-      title: '🚀Curso de Programación Web',
-      description: 'Aprende desarrollo web desde cero a tu propio ritmo. Olvídate de carreras largas y obtén una certificación oficial para postular a empleos bien pagados en tecnología.',
-      url: 'https://go.hotmart.com/P106773049T', // Página de Ventas General
-      buttonText: '🔍 Curso de Programación Web ISE',
-      badge: 'Top',
-      image: 'https://media.istockphoto.com/id/2228764569/es/foto/desarrolladora-de-software-hispana-codificando-por-la-noche-en-la-oficina.jpg?s=612x612&w=0&k=20&c=Op80u7Twutb1cVdJjxiXnJXeA17FNBSBw6wSPE4Wquc=',
-      
-      // 🔥 Activación de la misma lógica de pestañas para aprovechar todos los enlaces
-      tieneOpcionesExtra: true,
-      clases: [
-        { label: '📦 Ver Página Oficial del Producto (Hotmart)', url: 'https://go.hotmart.com/P106773049T?dp=1' },
-        { label: '🌐 Ver Página Externa del Programa', url: 'https://go.hotmart.com/P106773049T?ap=10b8' }
-      ],
-      preciosAlternativos: [
-        { label: '⚡ Checkout Directo Inscripción Rápida', url: 'https://go.hotmart.com/P106773049T?ap=4c83' },
-        { label: '💎 Checkout Directo (Pago de Contado Total)', url: 'https://go.hotmart.com/P106773049T?ap=7c17' }
-      ]
-    },
-
-    {
-      id: 3761463,
-      category: 'desarrollo',
-      title: '🌐 Curso Programación Web y Multiplataforma',
-      description: 'Lleva tu perfil tecnológico al siguiente nivel. Un programa completo diseñado para aprender a programar software seguro, diseñar videojuegos y desarrollar aplicaciones multiplataforma de alta calidad con las herramientas más cotizadas por las empresas.',
-      url: 'https://go.hotmart.com/Y106855907W',
-      buttonText: '🔍 Ver Curso Ahora',
-      badge: 'Top',
-      image: 'https://cdn.pixabay.com/photo/2016/09/14/08/26/web-1668927_1280.jpg',
-    },
-    {  
-      id: 3174895,
-      category: 'desarrollo',
-      title: '🛡️ Introducción Al Hacking Ético desde Cero',
-      description: 'Todas las demostraciones que se hacen en el curso podrás realizarlas en tu propio laboratorio. Aprenderás a instalar y configurar el laboratorio utilizando herramientas gratuitas.',
-      url: 'https://go.hotmart.com/F106792904G', 
-      buttonText: '🔍 Ver Curso Ahora',
-      badge: 'Top',
-      image: 'https://media.istockphoto.com/id/958989154/photo/ethical-hacking-concept-with-faceless-hooded-male-person.jpg?s=612x612&w=0&k=20&c=UqweFHES7NkxiFVws2Pz6QrswGrGvjYBumuS3zFMBCA=',
-    },
-    {
-      id: 6519747,
-      category: 'oficios',
-      title: '🔧 Reparación de Celulares',
-      description: 'Aprende a reparar dispositivos móviles paso a paso. Un programa completo diseñado para que empieces desde cero, domines el oficio y abras tu propio negocio técnico.',
-      url: 'https://go.hotmart.com/O106772582N',
-      buttonText: '🔍 Ver Curso ahora',
-      badge: 'Nuevo',
-      image: 'https://media.istockphoto.com/id/472354914/photo/technician-repairing-a-smarphone.jpg?s=612x612&w=0&k=20&c=XFp654ztifvYUXC8WDOSzZS41LcnIapPYKx1XeuQKC8=',
-    },
-    {
-      id: 1856891,
-      category: 'salud',
-      title: '🧘‍♀️ Sistema Yoga Restaurativo',
-      description: 'Descubre el método terapéutico diseñado para aliviar dolores corporales puntuales, liberar la tensión acumulada y reducir el estrés diario con sesiones de solo 5 minutos, Programa Online – Pago Único – Acceso Disponible Para Siempre',
-      url: 'https://go.hotmart.com/G106772402F',
-      buttonText: '🔍 Ver Curso Ahora',
-      badge: 'Recomendado',
-      image: 'https://media.istockphoto.com/id/2236914765/es/foto/mujer-practicando-postura-de-yoga-restaurativo-en-esterilla.jpg?s=612x612&w=0&k=20&c=2yx7Duh5CWSyAO_8pgQovDPd4OK8vjOlG-RsOX_sWw8=',
-    },
-    {
-      id: 3600856,
-      category: 'oficios',
-      title: '🎨 Diseña y Crea con Resina (PRO)',
-      description: 'Aprende desde cero y paso a paso a diseñar accesorios únicos en resina como llaveros, agendas, tazas y joyería. Evita los errores comunes y emprende tu negocio.',
-      url: 'https://go.hotmart.com/C106809529R', // Venta General
-      urlDescuento: 'https://go.hotmart.com/C106809529R?ap=1d28', // Lanzamiento oficial 37$
-      buttonText: '🛒 Ver Curso PRO',
-      badge: 'Lanzamiento',
-      image: 'https://static-media.hotmart.com/mscv29Nznog7exyHS4UmKm6h1sU=/filters:background_color(white)/hotmart/product_pictures/753d70da-ad49-4a5a-8bcb-c28508249ed1/PORTADACURSO.png',
-       // Enlaces adicionales organizados para el menú desplegable
-        tieneOpcionesExtra: true,
-        clases: [
-          { label: '📺 Ver Clase Gratuita Día #1', url: 'https://go.hotmart.com/C106809529R?ap=3a88' },
-          { label: '📺 Ver Clase Gratuita Día #2', url: 'https://go.hotmart.com/C106809529R?ap=8101' }
-        ],
-        preciosAlternativos: [
-          { label: '🇺🇸 Tarifa Especial EE.UU. (37$)', url: 'https://go.hotmart.com/C106809529R?ap=18eb' },
-          { label: '🔥 Oferta Flash Limitada (30$)', url: 'https://go.hotmart.com/C106809529R?ap=8b35' },
-          { label: '🏷️ Descuento Intermedio (47$)', url: 'https://go.hotmart.com/C106809529R?ap=b12e' },
-          { label: '📉 Cupón Especial (55$)', url: 'https://go.hotmart.com/C106809529R?ap=8124' },
-          { label: '💎 Acceso Premium Full (74$)', url: 'https://go.hotmart.com/C106809529R?ap=93c6' }
-        ]
-    },
-    {
-      id: 4436530, // ID del Curso Básico
-      category: 'oficios',
-      title: '💻 Diseña y Crea con Resina: Curso Básico',
-      description: 'Iníciate en el mundo de la resina con los conceptos esenciales. Conoce los materiales, proporciones y técnicas iniciales para tus primeras piezas.',
-      url: 'https://go.hotmart.com/S106801999T', // Venta General Básico
-      urlDescuento: 'https://go.hotmart.com/S106801999T?ap=b65b', // Opción principal 25$
-      buttonText: '🔍 Ver Curso Básico',
-      badge: 'Esencial',
-      image: 'https://static-media.hotmart.com/mscv29Nznog7exyHS4UmKm6h1sU=/filters:background_color(white)/hotmart/product_pictures/753d70da-ad49-4a5a-8bcb-c28508249ed1/PORTADACURSO.png', // <-- AQUÍ FALTABA LA COMA
-      
-      // Enlaces adicionales organizados para el menú desplegable
-      tieneOpcionesExtra: true,
-      clases: [],
-      preciosAlternativos: [
-        { label: '⚡ Oferta Mínima Curso Básico (20$)', url: 'https://go.hotmart.com/S106801999T?ap=0e44' }
-      ]
-    },
-
-    {
-      id: 8021975,
-      category: 'oficios',
-      title: '🧼 Curso Jabones y Velas Artesanales 2x1',
-      description: 'Curso completo para emprender tu negocio desde casa sin experiencia previa. Aprende el uso de bases orgánicas, aceites esenciales, moldes de silicona, cálculos y presupuestos. Incluye módulos de marca personal, venta en redes sociales y lista de proveedores.',
-      url: 'https://go.hotmart.com/O106861041A', // Reemplaza por tu Hotlink real de Hotmart
-      buttonText: '🔍 Ver Curso ahora',
-      badge: 'Lanzamiento',
-      image: 'https://static-media.hotmart.com/iJNxYBkzwOpQsYnv0Y0GStPlTfY=/filters:background_color(white)/hotmart/product_pictures/28657d7d-2074-4aeb-8df2-1c40c6634310/B1A95CA4048041E182927EB2706E8447.png',
-    },
-
-        {
-      id: 1010993,
-      category: 'oficios',
-      title: '💈 Master Barber Pro',
-      description: 'El programa más completo para convertirte en Barbero Maestro y abrir tu propio negocio. Aprende 21 cortes diferentes, tratamientos, afeitado tradicional y colorimetría de la mano de un bicampeón mundial. Incluye módulos de marketing, contabilidad, habilitación de locales y certificado.',
-      url: 'https://go.hotmart.com/G106801786P',
-      buttonText: '🔍 Ver Curso Ahora',
-      badge: 'Premium',
-      image: 'https://plus.unsplash.com/premium_photo-1661645788141-8196a45fb483?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YmFyYmVyaWF8ZW58MHx8MHx8fDA%3D',
-    },
-    {
-      id: 4817070,
-      category: 'salud',
-      title: '🌱 Guía Estilo de Vida Saludable',
-      description: 'Descubre el método integral para transformar tu estilo de vida, nutrir tu cuerpo y mejorar tu salud mental. Incluye planes de alimentación balanceada, rutinas de ejercicios accesibles en casa y técnicas efectivas de relajación para vivir con máxima energía y equilibrio diario.',
-      url: 'https://go.hotmart.com/O106802124X',
-      buttonText: '🔍 Ver Curso Ahora',
-      badge: 'Bienestar',
-      image: 'https://images.unsplash.com/photo-1504732099162-d8c9d5ba3bfd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDJ8fHxlbnwwfHx8fHw%3D',
-    },
-    {
-      id: 5239873,
-      category: 'salud',
-      title: '💖 Programa Amor Propio y Autoestima',
-      description: 'Inicia un viaje transformador hacia una relación más fuerte y compasiva contigo mismo. Accede a videos diarios de inspiración, metas guiadas y ejercicios prácticos diseñados para silenciar la autocrítica, fortalecer tu confianza y construir una autoestima indestructible día a día.',
-      url: 'https://go.hotmart.com/W106802341H',
-      buttonText: '🔍 Ver Curso Ahora',
-      badge: 'Suscripción',
-      image: 'https://images.unsplash.com/photo-1643736547280-6b06661fa835?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGFtb3IlMjBwcm9waW98ZW58MHx8MHx8fDA%3D',
-    }, 
-    // Agrega estos dos bloques por separado en tu lista de productos de desarrollo:
-
-    {
-      id: 4981864, // Producto 1: Enfocado 100% en la mina de oro de la IA (Curso en Video)
-      category: 'desarrollo',
-      title: '🤖 Negocios Digitales con Inteligencia Artificial',
-      description: 'El máster definitivo en video. Domina Chat GPT, Machine Learning y Big Data para automatizar canales de YouTube, crear influencers artificiales y montar agencias de Copywriting altamente rentables.',
-      url: 'https://go.hotmart.com/M106859320X', // Link principal del curso en video
-      buttonText: '🔥 Ver Máster con IA Ahora',
-      badge: 'Tendencia',
-      image: 'https://cdn.pixabay.com/photo/2020/07/08/04/12/work-5382501_1280.jpg',
-      
-      // Al ser un producto de alto valor con link único, no requiere pestañas de descuento para no abaratarlo
-      tieneOpcionesExtra: false,
-      clases: [],
-      preciosAlternativos: []
-    },
-
-    {
-      id: 5825945, // Producto 2: El Pack de Emprendimiento Digital (Formatos E-book / Guías)
-      category: 'desarrollo',
-      title: '📖 CURSO: Negocio Digital desde Cero',
-      description: 'Descubre el paso a paso para validar ideas, gestionar tiendas online y vender servicios en redes sociales. Una guía práctica diseñada para jóvenes que buscan libertad financiera sin grandes capitales.',
-      url: 'https://go.hotmart.com/E106805690P', // Botón Gris Principal (Negocio Digital)
-      buttonText: '📘 Ver Curso: Negocio Digital desde Cero',
-      badge: 'Recomendado',
-      image: 'https://static-media.hotmart.com/iyA8YmufW6hevRIUpwaMfOm9Y6U=/filters:background_color(white)/hotmart/product_pictures/c062d1ce-3bb8-4ed8-b28f-48290790dd15/LOGO.PNG',
-      
-      // Usamos el botón verde para el e-book de marketing ya que es un excelente complemento directo
-      urlExtra: 'https://go.hotmart.com/F106858942V', // ID 6013027 (Negocios Digitales: Marketing)
-      buttonTextExtra: '🔍  Ver Curso: Marketing y Finanzas',
-
-      // Dejamos false el desplegable aquí para que no sature con los mismos enlaces
-      tieneOpcionesExtra: false,
-      clases: [],
-      preciosAlternativos: []
-    },
-
-    {
-      id: 891198, // Identificador único consecutivo para tu catálogo
-      category: 'oficios', // Clasificado en Salud/Bienestar (o cámbialo a 'oficios' según prefieras)
-      title: '🎹 Academia de Piano: Toca Piano Fácil desde Cero',
-      description: 'Aprende los fundamentos de la música y desarrolla tu sensibilidad artística. Domina posiciones de dedos, formación de acordes, inversiones y círculos armónicos mediante ejercicios prácticos paso a paso para interpretar tus canciones favoritas. ¡Único pago para siempre con certificación oficial y acceso ilimitado!',
-      url: 'https://go.hotmart.com/A106864024O?dp=1', // Coloca aquí tu Hotlink de afiliado copiado de Hotmart
-      buttonText: '🎹 Ver Curso: Piano desde Cero',
-      badge: 'Master Class',
-      image: 'https://static-media.hotmart.com/Eu6_dfdjrvVKrQXkBQ5zKrd-rA4=/filters:background_color(white)/hotmart/product_pictures/331e1440-4cd6-4711-9856-12638da5d5ea/MasterSello14.jpg', // Imagen limpia y profesional de teclado/piano
-    },
-    {
-      id: 2988032, // ID de Cosmetología como referencia principal
-      category: 'oficios',
-      title: '👑 Especialidades Estéticas: Cosmetología + Manicura',
-      description: 'Aprende las técnicas más solicitadas del sector de la belleza. Conviértete en profesional de la estética facial o el diseño de uñas con un método paso a paso, sencillo y eficaz. Desarrolla un negocio lucrativo, sólido y sostenible desde la comodidad de tu casa usando solo tu celular.',
-      badge: 'Lanzamiento',
-      image: 'https://media.istockphoto.com/id/1497806504/es/foto/peluquer%C3%ADa-en-sal%C3%B3n-de-belleza-la-mujer-se-peina-en-el-sal%C3%B3n-de-belleza-moderno-estilista-seca.jpg?s=612x612&w=0&k=20&c=W4gT9tOhXW8WyK7Qz2UEV4PM75v8Pbk2QXmLQnZMM6c=',
-      
-      // CONFIGURACIÓN DE LOS DOS BOTONES (Tu JSX los pintará con los estilos azul y gris respectivamente)
-      urlBoton1: 'https://go.hotmart.com/U106873037M', // ID 2988032 - Cosmetología
-      textBoton1: '🧴 Ver Curso: Cosmetología Profesional',
-        
-      urlBoton2: 'https://go.hotmart.com/Q106873316P', // ID 2925316 - Manicura
-      textBoton2: '💅 Ver Curso: Manicurista Profesional',
-
-      // Estructura de compatibilidad para tu catálogo filtrado
-      tieneOpcionesExtra: false,
-      clases: [],
-      preciosAlternativos: []
-    },
-  ];
 
   return ( 
     <div className="page-container">
@@ -360,68 +164,56 @@ export default function App() {
           </div>
         </aside>
       </header>
-      
-{/* 
-      <section className="video-section">
-        <div className="section-title">
-          <h2>Descubre el potencial del No-Code en 5 minutos</h2>
-          <p>Echa un vistazo a la explicación detallada y descubre por qué esta es la habilidad más demandada del mercado.</p>
-        </div>
-      </section>
+ 
+<section id="productos-recomendados" className="features-section recommended-section" style={{ padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
+  <div className="section-title" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+    {/* 1. Título e introducción */}
+    <h2 style={{ fontSize: '1.8rem', color: '#1f007d', marginBottom: '1rem', fontWeight: 'bold' }}>
+      🎓 Catálogo de Especializaciones Profesionales
+    </h2>
+    <p style={{ color: '#666', lineHeight: '1.6', fontSize: '1rem', marginBottom: '1.5rem' }}>
+      Domina los oficios más lucrativos y demandados del mercado actual. Elige tu curso, estudia a tu propio ritmo y obtén tu certificación internacional. Empieza a construir tu futuro hoy mismo.
+    </p>
+    {/* 2. Badge/Etiqueta estilizada para la garantía */}
+    <div style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+      backgroundColor: '#06095f',
+      border: '1px solid #400386',
+      color: '#ffffff',
+      padding: '6px 16px',
+      borderRadius: '9999px',
+      fontSize: '0.85rem',
+      fontWeight: '600',
+      marginTop: '0.5rem',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+    }}>
+      <span>"Tu inversión está 100% protegida con nuestra garantía de satisfacción."</span>
+    </div>
+   {/* 3. Cuadro destacado para la propuesta de valor (Optimizado para Conversión) */}
+<div style={{
+  backgroundColor: '#f0fdf4', // 🟢 Fondo verde sutil (Asociado a éxito, avance y seguridad)
+  border: '1px solid #16a34a', // Borde verde esmeralda profesional
+  borderRadius: '12px',
+  padding: '1.25rem',
+  margin: '1.5rem auto',
+  maxWidth: '650px',
+  boxShadow: '0 2px 8px rgba(22,163,74,0.08)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  textAlign: 'left'
+}}>
+  {/* 💡 Cambiamos la prohibición por el foco del descubridor/curador experto */}
+  <span style={{ fontSize: '1.5rem', backgroundColor: '#dcfce7', padding: '6px 10px', borderRadius: '8px' }}>💡</span>
+  <p style={{ margin: 0, color: '#166534', fontSize: '0.95rem', lineHeight: '1.5' }}>
+    <strong style={{ color: '#14532d' }}>En Portal EducaDG no seleccionamos cursos al azar:</strong> Los auditamos y organizamos por afinidad temática. Nuestro objetivo es garantizar que pases de un <em>"quiero aprender"</em> a <em>"este es el programa exacto que se ajusta a mi nivel, mi presupuesto y mi país"</em> con total seguridad.
+  </p>
+</div>
 
-      <section className="cta-container-section">
-        <div className="features-grid">
-*/}          
-          {/* Columna 1 */}
-          {/* 
-          <article className="feature-card">
-            <div className="icon-box">🥇</div>
-            <h3>¿Qué vas a lograr?</h3>
-            <ul>
-              <li>Construir aplicaciones funcionales sin tocar una sola línea de código.</li>
-              <li>Validar tus ideas de negocio en tiempo récord y con bajo presupuesto.</li>
-              <li>Dominar las plataformas No-Code más populares del mercado actual.</li>
-              <li>Ahorrar miles de dólares en agencias o desarrolladores externos.</li>
-            </ul>
-          </article>
-*/}
-          {/* Columna 2 */}
- {/* 
-          <article className="feature-card">
-            <div className="icon-box">🏆</div>
-            <h3>¿Este curso es para ti?</h3>
-            <ul>
-              <li><strong>Emprendedores</strong> que buscan crear un Producto Mínimo Viable (MVP).</li>
-              <li><strong>Creativos y Diseñadores</strong> que quieren materializar sus ideas interactivas.</li>
-              <li><strong>Principiantes absolutos</strong> curiosos por la tecnología digital.</li>
-              <li>Profesionales que quieren agregar una habilidad altamente rentable a su perfil.</li>
-            </ul>
-          </article>
-Columna 2 */}
-          {/* Columna 3 */}
- {/* 
-          <div className="cta-purple-card">
-            <h2>¿Listo para dar el siguiente paso en tu carrera digital?</h2>
-            <p>"Aprende las habilidades más demandadas y obtén tu certificación internacional."</p>
-            <a href={hotmartUrl} target="_blank" rel="noreferrer" className="cta-button" style={{ textDecoration: 'none' }}>
-              🔥 Acceder al Curso Completo Aquí
-            </a>
-          </div>
 
-        </div>
-      </section>
-      Columna 3 */}
-
-      <section id="productos-recomendados" className="features-section recommended-section">
-        <div className="section-title">
-          <h2>🎓 Catálogo de Especializaciones Profesionales</h2>
-          <p>
-            Domina los oficios más lucrativos y demandados del mercado actual. Elige tu curso, estudia a tu propio ritmo y obtén tu certificación internacional. Empieza a construir tu futuro hoy mismo.
-          </p>
-          <h5 style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>
-            "Tu inversión está 100% protegida con nuestra garantía de satisfacción."
-          </h5>
-        </div>
+  </div>
 
 
 {/* Categoría: Desarrollo y Negocios Digitales */}
@@ -434,50 +226,50 @@ Columna 2 */}
         <article className="feature-card recommended-card" key={product.id} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <img className="card-image" src={product.image} alt={product.title} loading="lazy" />
           <h3>{product.title}</h3>
-          <span className="recommended-badge">{product.badge}</span>
+          {product.badge && <span className="recommended-badge">{product.badge}</span>}
           <p>{product.description}</p>
           
-          {/* Contenedor flexible de botones */}
-          <div className="card-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: 'auto' }}>
-            
-            {/* CASO A: Botón del plan mensual (Exclusivo de Apps Rentables) */}
-            {product.urlMensual && (
-              <a 
-                className="btn-primary" 
-                href={product.urlMensual} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{ width: '100%', padding: '0.75rem', fontSize: '0.95rem', background: 'linear-gradient(to right, #2563eb, #7c3aed)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
-              >
-                🚀 Iniciar Plan Mensual ($67)
-              </a>
-            )}
+          {/* Contenedor flexible de botones (Diseño Original Intacto) */}
+<div className="card-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: 'auto' }}>
+  
+  {/* 🚀 BOTÓN 1: PLAN MENSUAL (Gradiente Azul/Morado) */}
+  {product.urlMensual && (
+    <a 
+      className="btn-primary" 
+      href={product.urlMensual} 
+      target="_blank" 
+      rel="noreferrer"
+      style={{ width: '100%', padding: '0.75rem', fontSize: '0.95rem', background: 'linear-gradient(to right, #2563eb, #7c3aed)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
+    >
+      {product.buttonTextMensual || '🚀 Iniciar Plan Mensual'}
+    </a>
+  )}
 
-            {/* CASO B: Botón para el segundo curso alternativo de Programación Desde 0 */}
-            {product.urlExtra && (
-              <a 
-                className="btn-primary" 
-                href={product.urlExtra} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{ width: '100%', padding: '0.75rem', fontSize: '0.95rem', background: 'linear-gradient(to right, #10b981, #059669)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
-              >
-                {product.buttonTextExtra}
-              </a>
-            )}
+  {/* 🏷️ BOTÓN 2: DESCUENTO / PROGRAMACIÓN INICIAL (Añade este bloque para corregir el error) */}
+  {product.urlDescuento && (
+    <a 
+      className="btn-discount" 
+      href={product.urlDescuento} 
+      target="_blank" 
+      rel="noreferrer"
+      style={{ width: '100%', padding: '0.75rem', fontSize: '0.95rem', background: 'linear-gradient(to right, #10b981, #059669)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
+    >
+      {product.buttonTextDescuento || '🔍 Ver Curso con Descuento'}
+    </a>
+  )}
 
-            {/* Botón Principal/Estándar de la tarjeta */}
-            <a 
-              className="btn-secondary" 
-              href={product.url} 
-              target="_blank" 
-              rel="noreferrer"
-              style={{ width: '100%', padding: '0.75rem', fontSize: '0.9rem', backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#475569', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', border: '2px solid #cbd5e1' }}
-            >
-              {product.buttonText}
+  {/* 💻 BOTÓN 3: PRINCIPAL / ESTÁNDAR DE LA TARJETA */}
+  <a 
+    className="btn-secondary" 
+    href={product.url} 
+    target="_blank" 
+    rel="noreferrer"
+    style={{ width: '100%', padding: '0.75rem', fontSize: '0.9rem', backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#475569', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', border: '2px solid #cbd5e1' }}
+  >
+    {product.buttonText || '🔍 Ver Temario Completo'}
             </a>
 
-            {/* PESTAÑA DESPLEGABLE DINÁMICA PARA APPS RENTABLES (LOGICA IDENTICA A OFICIOS) */}
+            {/* PESTAÑA DESPLEGABLE DINÁMICA PARA APPS RENTABLES / DESARROLLO */}
             {product.tieneOpcionesExtra && (
               <div style={{ width: '100%', marginTop: '0.1rem' }}>
                 <button
@@ -488,7 +280,7 @@ Columna 2 */}
                   {openProductMenu === product.id ? '🔼 Ocultar contenido y accesos directos' : '🔽 Ver clases gratis y checkout pago único'}
                 </button>
 
-                {/* Contenido desplegable */}
+                {/* Contenido desplegable (Diseño Original con Texto en Negrita Corregido) */}
                 {openProductMenu === product.id && (
                   <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.4rem', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', textAlign: 'left' }}>
                     
@@ -497,7 +289,13 @@ Columna 2 */}
                       <>
                         <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', paddingLeft: '0.2rem', marginTop: '0.1rem' }}>MATERIAL GRATUITO Y CLASES:</div>
                         {product.clases.map((clase, index) => (
-                          <a key={index} href={clase.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#eff6ff', color: '#2563eb', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '500', border: '1px solid #bfdbfe' }}>
+                          <a 
+                            key={index} 
+                            href={clase.url} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#eff6ff', color: '#2563eb', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '700', border: '1px solid #bfdbfe' }}
+                          >
                             {clase.label}
                           </a>
                         ))}
@@ -509,7 +307,13 @@ Columna 2 */}
                       <>
                         <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', paddingLeft: '0.2rem', marginTop: '0.2rem' }}>MÁS OPCIONES DE ACCESO:</div>
                         {product.preciosAlternativos.map((opcion, index) => (
-                          <a key={index} href={opcion.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#ffffff', color: '#334155', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '500', border: '1px solid #e2e8f0' }}>
+                          <a 
+                            key={index} 
+                            href={opcion.url} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#ffffff', color: '#334155', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '700', border: '1px solid #e2e8f0' }}
+                          >
                             {opcion.label}
                           </a>
                         ))}
@@ -525,7 +329,6 @@ Columna 2 */}
       ))}
   </div>
 </div>
-
 
 
 {/* Categoría: Oficios */}
@@ -570,20 +373,24 @@ Columna 2 */}
                 </a>
               </>
             ) : (
-              /* RENDERIZADO POR DEFECTO PARA TODOS LOS DEMÁS PRODUCTOS SEPARADOS (INCLUYE RESINA PRO Y BÁSICO) */
-              <>
-                {/* BOTÓN DE DESCUENTO (Aparece arriba en verde con máxima prioridad si existe urlDescuento) */}
-                {(product.urlDescuento || product.urlMensual) && (
-                  <a 
-                    className="btn-primary" 
-                    href={product.urlDescuento || product.urlMensual} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    style={{ width: '100%', padding: '0.65rem', fontSize: '0.9rem', background: 'linear-gradient(to right, #10b981, #059669)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
-                  >
-                    {product.id === 1 ? '🚀 Iniciar Plan Mensual' : `🔥 Inscripción con Oferta (${product.id === 3600856 ? '37$' : '25$'})`}
-                  </a>
-                )}
+/* RENDERIZADO POR DEFECTO PARA TODOS LOS DEMÁS PRODUCTOS SEPARADOS (INCLUYE RESINA PRO Y BÁSICO) */
+<>
+  {/* BOTÓN DE DESCUENTO O MENSUAL (100% Dinámico desde tu formulario de Supabase) */}
+  {(product.urlDescuento || product.urlMensual) && (
+    <a 
+      className="btn-primary" 
+      href={product.urlDescuento || product.urlMensual} 
+      target="_blank" 
+      rel="noreferrer"
+      style={{ width: '100%', padding: '0.65rem', fontSize: '0.9rem', background: 'linear-gradient(to right, #10b981, #059669)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
+    >
+      {/* 🚀 CORRECCIÓN: Si hay texto de descuento guardado, usa ese; si es mensual usa el mensual, de lo contrario un texto de respaldo */}
+      {product.urlDescuento 
+        ? (product.buttonTextDescuento || '🔥 Inscripción Lanzamiento') 
+        : (product.buttonTextMensual || '🚀 Iniciar Plan Mensual')
+      }
+    </a>
+  )}
 
                 {/* BOTÓN PRINCIPAL / ESTÁNDAR (Página de ventas general al fondo en color gris) */}
                 <a 
@@ -616,7 +423,7 @@ Columna 2 */}
                           <>
                             <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', paddingLeft: '0.2rem', marginTop: '0.1rem' }}>LECCIONES EN VIVO:</div>
                             {product.clases.map((clase, index) => (
-                              <a key={index} href={clase.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#eff6ff', color: '#2563eb', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '500', border: '1px solid #bfdbfe' }}>
+                              <a key={index} href={clase.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#eff6ff', color: '#2563eb', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '700', border: '1px solid #bfdbfe' }}>
                                 {clase.label}
                               </a>
                             ))}
@@ -628,7 +435,7 @@ Columna 2 */}
                           <>
                             <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', paddingLeft: '0.2rem', marginTop: '0.2rem' }}>MÁS OPCIONES DE COMPRA:</div>
                             {product.preciosAlternativos.map((opcion, index) => (
-                              <a key={index} href={opcion.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#ffffff', color: '#334155', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '500', border: '1px solid #e2e8f0' }}>
+                              <a key={index} href={opcion.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#ffffff', color: '#334155', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '700', border: '1px solid #e2e8f0' }}>
                                 {opcion.label}
                               </a>
                             ))}
@@ -647,29 +454,223 @@ Columna 2 */}
   </div>
 </div>
 
+{/* Categoría: Salud */}
+<div className="category-block">
+  <h3 className="category-title">🩺 Salud y Bienestar</h3>
+  <div className="features-grid catalog-grid">
+    {recommendedProducts
+      .filter((product) => product.category === 'salud')
+      .map((product) => (
+        <article className="feature-card recommended-card" key={product.id} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <img className="card-image" src={product.image} alt={product.title} loading="lazy" />
+          <h3>{product.title}</h3>
+          <span className="recommended-badge">{product.badge}</span>
+          <p>{product.description}</p>
+          
+          {/* Contenedor dinámico de botones flexible para Salud */}
+          <div className="card-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%', marginTop: 'auto' }}>
+            
+            {/* CONDICIONAL EXCLUSIVA PARA EL COMBO ELITE CON DOS BOTONES */}
+            {product.urlBoton1 && product.urlBoton2 ? (
+              <>
+                {/* Botón 1 (Estilo Azul Destacado) */}
+                <a 
+                  className="btn-secondary" 
+                  href={product.urlBoton1} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  style={{ width: '100%', padding: '0.65rem', fontSize: '0.85rem', backgroundColor: '#ffffff', color: '#1d4ed8', borderColor: '#3b82f6', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', border: '2px solid #3b82f6' }}
+                >
+                  {product.textBoton1}
+                </a>
 
-
-
-        {/* Categoría: Salud */}
-        <div className="category-block">
-          <h3 className="category-title">🧘 Salud y Bienestar</h3>
-          <div className="features-grid catalog-grid">
-            {recommendedProducts
-              .filter((product) => product.category === 'salud')
-              .map((product) => (
-                <article className="feature-card recommended-card" key={product.id}>
-                  <img className="card-image" src={product.image} alt={product.title} loading="lazy" />
-                  <h3>{product.title}</h3>
-                  <span className="recommended-badge">{product.badge}</span>
-                  <p>{product.description}</p>
-                  <a className="btn-secondary" href={product.url} target="_blank" rel="noreferrer">
-                    {product.buttonText}
+                {/* Botón 2 (Estilo Gris Estandár) */}
+                <a 
+                  className="btn-secondary" 
+                  href={product.urlBoton2} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  style={{ width: '100%', padding: '0.65rem', fontSize: '0.85rem', backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#475569', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', border: '2px solid #cbd5e1' }}
+                >
+                  {product.textBoton2}
+                </a>
+              </>
+            ) : (
+              /* RENDERIZADO POR DEFECTO PARA TODOS LOS DEMÁS PRODUCTOS SEPARADOS */
+              <>
+                {/* BOTÓN DE DESCUENTO O MENSUAL (100% Dinámico desde tu formulario) */}
+                {(product.urlDescuento || product.urlMensual) && (
+                  <a 
+                    className="btn-primary" 
+                    href={product.urlDescuento || product.urlMensual} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{ width: '100%', padding: '0.65rem', fontSize: '0.9rem', background: 'linear-gradient(to right, #10b981, #059669)', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', color: 'white' }}
+                  >
+                    {product.urlDescuento 
+                      ? (product.buttonTextDescuento || '🔥 Inscripción Lanzamiento') 
+                      : (product.buttonTextMensual || '🚀 Iniciar Plan Mensual')
+                    }
                   </a>
-                </article>
-              ))}
+                )}
+
+                {/* BOTÓN PRINCIPAL / ESTÁNDAR (Página de ventas general al fondo en color gris) */}
+                <a 
+                  className="btn-secondary" 
+                  href={product.url} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  style={(product.urlDescuento || product.urlMensual) ? { width: '100%', padding: '0.65rem', fontSize: '0.85rem', backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#475569', textDecoration: 'none', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: '600', border: '2px solid #cbd5e1' } : {}}
+                >
+                  {product.buttonText}
+                </a>
+
+                {/* PESTAÑA DESPLEGABLE DINÁMICA PARA LOS LINKS EXTRAS (REMARKETING, CLASES) */}
+                {product.tieneOpcionesExtra && (
+                  <div style={{ width: '100%', marginTop: '0.2rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => toggleMenu(product.id)}
+                      style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', backgroundColor: '#f1f5f9', color: '#1e293b', border: '1px dashed #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
+                    >
+                      {openProductMenu === product.id ? '🔼 Ocultar opciones de ahorro' : '🔽 Ver más precios y clases gratis'}
+                    </button>
+
+                    {/* Contenido desplegable */}
+                    {openProductMenu === product.id && (
+                      <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.4rem', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        
+                        {/* Renderizado de Clases Gratuitas */}
+                        {product.clases && product.clases.length > 0 && (
+                          <>
+                            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', paddingLeft: '0.2rem', marginTop: '0.1rem' }}>RECURSOS GRATUITOS:</div>
+                            {product.clases.map((clase, index) => (
+                              <a key={index} href={clase.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#eff6ff', color: '#2563eb', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '700', border: '1px solid #bfdbfe' }}>
+                                {clase.label}
+                              </a>
+                            ))}
+                          </>
+                        )}
+
+                        {/* Renderizado de Precios de Descuento Alternativos */}
+                        {product.preciosAlternativos && product.preciosAlternativos.length > 0 && (
+                          <>
+                            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', paddingLeft: '0.2rem', marginTop: '0.2rem' }}>MÁS OPCIONES DE COMPRA:</div>
+                            {product.preciosAlternativos.map((opcion, index) => (
+                              <a key={index} href={opcion.url} target="_blank" rel="noreferrer" style={{ width: '100%', padding: '0.45rem', fontSize: '0.8rem', backgroundColor: '#ffffff', color: '#334155', textDecoration: 'none', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', fontWeight: '700', border: '1px solid #e2e8f0' }}>
+                                {opcion.label}
+                              </a>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
+
+        </article>
+      ))}
+  </div>
+</div>
+</section> {/* Cierre de #productos-recomendados */}
+
+
+      {/* Sección: Preguntas Frecuentes estilo Dos Columnas */}
+      <section id="faq" className="faq-section">
+        <div className="faq-container">
+          
+          {/* Columna Izquierda: Títulos y Contacto */}
+          <div className="faq-sidebar">
+            <span className="faq-tag">PREGUNTAS FRECUENTES</span>
+            <h2 className="faq-title">Antes de explorar el catálogo</h2>
+            <p className="faq-text">
+              Si te queda alguna duda, escríbenos a{' '}
+              <a href="mailto:portaleducadg@gmail.com" className="faq-email">portaleducadg@gmail.com</a>
+              {' '}o visita nuestras redes sociales:
+            </p>
+            
+            {/* Iconos de Redes Sociales */}
+            <div className="faq-socials">
+              <a href="https://web.facebook.com/portaleducadg" target="_blank" rel="noreferrer" aria-label="Facebook" className="social-icon face">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <span className="social-name">Facebook</span>
+              </a>
+              
+              <a href="https://www.instagram.com/portaleducadg" target="_blank" rel="noreferrer" aria-label="Instagram" className="social-icon inst">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                <span className="social-name">Instagram</span>
+              </a>
+              
+              <a href="https://www.tiktok.com/@educadg" target="_blank" rel="noreferrer" aria-label="TikTok" className="social-icon tiktok">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .74.1v-3.5a6.33 6.33 0 0 0-4.34 1.5 6.34 6.34 0 0 0-1.9 4.78 6.34 6.34 0 0 0 6.34 6.35 6.35 6.35 0 0 0 6.35-6.35V7.95a11.23 11.23 0 0 0 6.63 2.19v-3.4a7.86 7.86 0 0 1-3.71-2.05z"/></svg>
+                <span className="social-name">TikTok</span>
+              </a>
+              {/* Canal de WhatsApp Corregido */}
+              <a href="https://whatsapp.com/channel/0029VbDLItMEKyZ8AGixbT3L" target="_blank" rel="noreferrer" aria-label="WhatsApp" className="social-icon whats">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <path d="M12.011 2c-5.514 0-9.99 4.477-9.99 9.99 0 1.76.456 3.415 1.256 4.869L2 22l5.314-1.395c1.393.762 2.976 1.196 4.664 1.196 5.517 0 9.991-4.473 9.991-9.99S17.528 2 12.011 2zm5.836 14.129c-.242.678-1.215 1.24-1.946 1.314-.492.05-1.133.079-3.277-.812-2.736-1.139-4.46-3.92-4.597-4.103-.135-.183-1.127-1.493-1.127-2.843 0-1.35.705-2.014.957-2.292.25-.278.56-.353.748-.353.187 0 .375.004.55.016.183.012.43-.07.671.507.242.583.824 2.011.896 2.158.07.146.117.316.019.511-.097.195-.148.316-.296.488-.148.176-.312.406-.44.547-.152.152-.312.32-.132.628.18.312.8 1.343 1.742 2.183.181.161.434.354.721.508 1.196.634 1.838.745 2.146.852.4.137.64.043.832-.15.226-.226.856-.995 1.085-1.342.226-.347.456-.289.77-.175.312.113 1.98.933 2.32 1.101.34.168.567.246.652.391.086.145.086.832-.156 1.511z"/>
+                </svg>
+                <span className="social-name">Canal WhatsApp</span>
+              </a>
+
+            </div>
+
+
+          </div>
+
+          {/* Columna Derecha: El Bloque de Acordeones */}
+          <div className="faq-content-box">
+            <details className="faq-item">
+              <summary className="faq-question">¿Qué es exactamente Portal EducaDG?</summary>
+              <div className="faq-answer">
+                <p>Somos una plataforma que recopila y recomienda los mejores cursos digitales y programas interactivos del mercado, ayudándote a encontrar la formación ideal para tu crecimiento personal y profesional.</p>
+                <p>Reunimos cursos en español que viven en distintas plataformas de infoproductos y los organizamos por grandes temáticas para que sea más fácil comparar opciones antes de comprar.</p>
+              </div>
+            </details>
+
+            <details className="faq-item">
+              <summary className="faq-question">¿Cuesta algo usar Portal EducaDG?</summary>
+              <div className="faq-answer">
+                <p>No, el acceso y uso de nuestro catálogo de recomendaciones es completamente gratuito para todos los usuarios.</p>
+                <p>Sólo pagas cuando decides matricularte en un curso concreto, y el pago se hace directamente al proveedor a través del enlace que mostramos en cada ficha.</p>
+              </div>
+            </details>
+
+            <details className="faq-item">
+              <summary className="faq-question">¿Puedo confiar en la compra? ¿Hay garantía?</summary>
+              <div className="faq-answer">
+                <p>Absolutamente. Todos los productos recomendados se procesan a través de Hotmart, una plataforma líder y segura a nivel mundial que cuenta con garantía de devolución (generalmente de 7 a 15 días) si el producto no cumple tus expectativas.</p>
+                <p>La compra la haces en el sitio del proveedor, no en Portal EdicaDG</p>
+              </div>
+            </details>
+
+            <details className="faq-item">
+              <summary className="faq-question">¿Con qué frecuencia actualizan el catálogo?</summary>
+              <div className="faq-answer">
+                <p>Actualizamos nuestro catálogo de manera constante, evaluando nuevos cursos y herramientas para asegurar que siempre tengas acceso a las opciones más cotizadas y actualizadas.</p>
+                <p>Eliminamos los que pierden soporte y añadimos nuevos lanzamientos que encajan con nuestras rutas</p>
+              </div>
+            </details>
+
+            <details className="faq-item">
+              <summary className="faq-question">¿Puedo sugerir un curso o tengo una consulta?</summary>
+              <div className="faq-answer">
+                  <p>¡Por supuesto! Nos encanta escuchar a nuestra comunidad. Puedes escribirnos directamente a nuestro correo oficial{' '}
+                  <a href="mailto:portaleducadg@gmail.com" className="faq-email">portaleducadg@gmail.com</a> o contactarnos a través de nuestras redes sociales.
+                </p>
+                <p style={{ marginTop: '8px' }}>Leemos cada mensaje de inmediato y, si el curso que sugieres cumple con nuestros estándares, lo priorizamos para darte una respuesta pronta. Te enviaremos el enlace de acceso directo al curso en cuestión de minutos para que no pierdas tiempo y puedas asegurar tu cupo de inmediato. ¡Quédate atento a tus mensajes!</p>
+                </div>
+            </details>
+          </div>
+
         </div>
- </section> {/* Cierre de #productos-recomendados */}
+      </section>
+
+
+ 
 
       {/* 💬 BOTÓN FLOTANTE ESTILO WIDGET DE CHAT (REEMPLAZO) */}
       <button 

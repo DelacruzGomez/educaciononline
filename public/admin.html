@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Portal EducaDG</title>
+    
+    <!-- 📦 Invocación local directa unificada sin depender de internet o servidores externos bloqueados -->
+    <script src="/supabase-local.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background-color: #1e1e1e; padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #00e676; margin-top: 0; }
+        label { display: block; margin: 12px 0 6px; font-weight: bold; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background-color: #2a2a2a; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 6px; background-color: #00e676; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #00b359; }
+        .hidden { display: none; }
+        .logout-btn { background-color: #ff5252; color: white; margin-top: 10px; }
+        .logout-btn:hover { background-color: #d32f2f; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- SECCIÓN 1: FORMULARIO DE LOGIN (Solo Login, sin opción de Registro) -->
+    <div id="loginSection">
+        <h2>🔐 Acceso Administrador</h2>
+        <form id="loginForm">
+            <label>Correo Electrónico:</label>
+            <input type="email" id="loginEmail" required placeholder="admin@portaleducadg.com">
+            
+            <label>Contraseña:</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••">
+            
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <!-- SECCIÓN 2: PANEL DE LLENADO DE CURSOS (Oculto por defecto) -->
+    <div id="adminPanel" class="hidden">
+        <h2>Portal EducaDG</h2>
+        <p style="text-align: center; color: #ffffff;">PANEL DE CURSOS</p>
+        <p style="text-align: center; color: #aaa;">Conectado como: <span id="adminEmail" style="color:#00e676"></span></p>
+        
+        <form id="cursoForm">
+            <label>ID del Producto (Número de Hotmart):</label>
+            <input type="number" id="id" required placeholder="Ej: 3600856">
+
+            <label>Categoría:</label>
+            <select id="category">
+                <option value="desarrollo">Desarrollo y Tecnología</option>
+                <option value="oficios">Oficios</option>
+                <option value="salud">Salud y Bienestar</option>
+            </select>
+
+            <label>Título / Nombre del Curso:</label>
+            <input type="text" id="title" required placeholder="Ej: 🎨 Diseña y Crea con Resina (PRO)">
+
+            <label>Descripción:</label>
+            <textarea id="description" rows="3" required placeholder="Escribe de qué trata el curso..."></textarea>
+
+            <!-- 🔗 ENLACE 1: PRINCIPAL / VENTA GENERAL -->
+            <label>URL / Enlace Principal (Venta General):</label>
+            <input type="url" id="url" required placeholder="https://go.hotmart.com/...">
+            
+            <label>Texto del Botón:</label>
+            <input type="text" id="buttonText" value="🛒 Ver Curso PRO" required>
+
+            <!-- 🔗 ENLACE 2: DESCUENTO (Campos Nuevos Corregidos) -->
+            <label>URL Enlace con Descuento (Opcional):</label>
+            <input type="url" id="urlDescuento" placeholder="https://hotmart.com">
+
+            <label>Texto del Botón de Descuento (Opcional):</label>
+            <input type="text" id="buttonTextDescuento" placeholder="Ej: 🏷️ Obtener Descuento Especial">
+
+            <!-- 🔗 ENLACE 3: ALTERNATIVO / MENSUAL -->
+            <label>URL Enlace Alternativo / Mensual (Opcional):</label>
+            <input type="url" id="urlMensual" placeholder="https://go.hotmart.com/... Plan Mensual">
+
+            <label>Texto del Botón Alternativo / Mensual (Opcional):</label>
+            <input type="text" id="buttonTextMensual" placeholder="Ej: 🚀 Iniciar Plan Mensual ($67)">
+
+            <label>Badge / Listón Decorativo:</label>
+            <input type="text" id="badge" value="🏅 CERTIFICADO DE PARTICIPACIÓN" required>
+
+            <label>URL Imagen del Producto (Hotmart o externa):</label>
+            <input type="url" id="image" required placeholder="https://hotmart.com...">
+
+            <label>¿Tiene opciones extra o clases gratuitas?</label>
+            <select id="tieneOpcionesExtra" onchange="toggleExtras()">
+                <option value="false">No</option>
+                <option value="true">Sí</option>
+            </select>
+
+            <!-- Campos avanzados estructurados en JSON -->
+            <div id="extrasSection" class="hidden">
+                <label>Clases Gratuitas (Formato JSON):</label>
+                <textarea id="clases" rows="2">[{"label": "📺 Ver Clase Gratuita Día #1", "url": "https://url.com"}]</textarea>
+
+                <label>Precios Alternativos / Cuotas (Formato JSON):</label>
+                <textarea id="preciosAlternativos" rows="4">[
+{"label": "🔥 Oferta Flash Limitada (S/ 107 / 30$)", "url": "https://url.com"},
+{"label": "💎 Acceso Premium Full (S/ 264 / 74$)", "url": "https://url.com"}
+]</textarea>
+            </div>
+
+            <button type="submit">🚀 Guardar y Publicar Curso</button>
+        </form>
+
+
+        <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión Segura</button>
+        
+        <!-- 📋 NUEVA SECCIÓN: LISTADO DE CURSOS EN TIEMPO REAL -->
+        <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
+            <h3 style="color: #00e676; text-align: center; margin-bottom: 15px;">🖥️ Cursos Publicados</h3>
+            <div id="listaCursosContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="text-align: center; color: #aaa; font-size: 14px;">Cargando catálogo...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Con esto nos aseguramos de usar la variable global limpia inyectada por el script de la cabecera
+    const SUPABASE_URL = "https://iuygoavokzrqirwapqve.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1eWdvYXZva3pycWlyd2FwcXZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjMwMDcsImV4cCI6MjEwMjg5OTAwN30.ivf-iSXwp84YO9Qp7JTzKoB95wrzLJRHYFfzKmzftys";
+    
+    // Inicialización tradicional instantánea
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const loginSection = document.getElementById('loginSection');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminEmailSpan = document.getElementById('adminEmail');
+
+    // Comprobación de estado del Administrador
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (session) {
+            loginSection.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+            adminEmailSpan.innerText = session.user.email;
+            cargarCursosRegistrados();
+        } else {
+            loginSection.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+        }
+    });
+
+    // Manejar el Inicio de Sesión
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            alert("Error de acceso: " + error.message);
+        } else {
+            alert("¡Bienvenido Administrador! Accediendo al catálogo...");
+        }
+    });
+
+    // Mostrar/Ocultar campos JSON extras si se marca "Sí"
+    function toggleExtras() {
+        const tieneExtras = document.getElementById('tieneOpcionesExtra').value === "true";
+        document.getElementById('extrasSection').classList.toggle('hidden', !tieneExtras);
+    }
+
+
+    // Guardar el producto en la Base de Datos
+    document.getElementById('cursoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        let clasesJSON = [];
+        let preciosJSON = [];
+        try {
+            if(document.getElementById('tieneOpcionesExtra').value === "true") {
+                // Modificamos estas dos líneas para limpiar el texto automáticamente antes de validar
+                let textoClases = document.getElementById('clases').value.replace(/'/g, '"');
+                let textoPrecios = document.getElementById('preciosAlternativos').value.replace(/'/g, '"');
+                
+                clasesJSON = JSON.parse(textoClases);
+                preciosJSON = JSON.parse(textoPrecios);
+            }
+        } catch (err) {
+            alert("Error en el formato de Clases o Precios Alternativos. Asegúrate de usar JSON válido (comillas dobles).");
+            return;
+        }
+
+        const nuevoCurso = {
+            id: parseInt(document.getElementById('id').value),
+            category: document.getElementById('category').value,
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            url: document.getElementById('url').value,
+            
+            // 🏷️ Enlace de Descuento y su nuevo Texto de Botón (Validados de forma segura)
+            urlDescuento: document.getElementById('urlDescuento') ? (document.getElementById('urlDescuento').value || null) : null,
+            buttonTextDescuento: document.getElementById('buttonTextDescuento') ? (document.getElementById('buttonTextDescuento').value || null) : null,
+            
+            // 🚀 Enlace Alternativo / Mensual y su Texto de Botón (Validados de forma segura)
+            urlMensual: document.getElementById('urlMensual') ? (document.getElementById('urlMensual').value || null) : null,
+            buttonTextMensual: document.getElementById('buttonTextMensual') ? (document.getElementById('buttonTextMensual').value || null) : null,
+            
+            // 🟢 Enlace Extra y su Texto de Botón (Protección contra Nulos si no están en tu HTML)
+            urlExtra: document.getElementById('urlExtra') ? (document.getElementById('urlExtra').value || null) : null,
+            buttonTextExtra: document.getElementById('buttonTextExtra') ? (document.getElementById('buttonTextExtra').value || null) : null,
+            
+            buttonText: document.getElementById('buttonText').value,
+            badge: document.getElementById('badge').value,
+            image: document.getElementById('image').value,
+            tieneOpcionesExtra: document.getElementById('tieneOpcionesExtra').value === "true",
+            clases: clasesJSON,
+            preciosAlternativos: preciosJSON
+        };
+
+
+        const { error } = await supabaseClient.from('cursos').upsert([nuevoCurso]);
+
+        if (error) {
+            alert("Error al guardar en Supabase: " + error.message);
+        } else {
+            alert("¡Curso guardado correctamente! El Chatbot y tu Catálogo ya lo pueden leer.");
+            document.getElementById('cursoForm').reset();
+            toggleExtras();
+            cargarCursosRegistrados(); // 🔄 Recargamos el listado al instante
+        }
+    });
+
+    // 📡 FUNCIÓN PARA CARGAR Y PINTAR LOS CURSOS REGISTRADOS
+    async function cargarCursosRegistrados() {
+        const container = document.getElementById('listaCursosContainer');
+        try {
+            const tokenKey = 'sb-' + SUPABASE_URL.replace('https://', '').split('.') + '-auth-token';
+            const sessionData = localStorage.getItem(tokenKey);
+            let headers = { 'apikey': SUPABASE_ANON_KEY };
+            if (sessionData) {
+                const parsed = JSON.parse(sessionData);
+                headers['Authorization'] = 'Bearer ' + parsed.access_token;
+            }
+
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/cursos?select=*`, {
+                method: 'GET',
+                headers: headers
+            });
+
+            if (!response.ok) throw new Error("No se pudo obtener la lista");
+            const cursos = await response.json();
+
+            if (cursos.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: #666; font-size: 14px;">Aún no has registrado ningún curso.</p>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            cursos.forEach(curso => {
+                const item = document.createElement('div');
+                item.style.cssText = "background-color: #2a2a2a; padding: 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; font-size: 14px; margin-bottom: 8px;";
+                
+                // Convertimos el objeto completo a texto plano seguro para pasarlo al botón
+                const datosCursoTexto = btoa(unescape(encodeURIComponent(JSON.stringify(curso))));
+
+                item.innerHTML = `
+                    <div style="flex-grow: 1; margin-right: 10px;">
+                        <strong style="color: #00e676;">ID: ${curso.id}</strong> - ${curso.title} 
+                        <br><span style="color: #aaa; font-size: 12px;">Categoría: ${curso.category}</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="cargarCursoEnFormulario('${datosCursoTexto}')" style="width: auto; padding: 6px 12px; margin-top: 0; background-color: #2196f3; color: white; font-size: 12px;">Editar</button>
+                        <button onclick="eliminarCursoDeBD(${curso.id})" style="width: auto; padding: 6px 12px; margin-top: 0; background-color: #ff5252; color: white; font-size: 12px;">Eliminar</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+        } catch (err) {
+            container.innerHTML = `<p style="text-align: center; color: #ff5252; font-size: 14px;">Error al cargar: ${err.message}</p>`;
+        }
+    }
+
+    // 📝 FUNCIÓN GLOBAL CLÁSICA PARA CARGAR LOS DATOS EN EL FORMULARIO SUPERIOR
+    function cargarCursoEnFormulario(datosCifrados) {
+        try {
+            // Decodificamos el objeto del curso de forma segura
+            const curso = JSON.parse(decodeURIComponent(escape(atob(datosCifrados))));
+
+            // Rellenamos las casillas básicas tradicionales
+            document.getElementById('id').value = curso.id;
+            document.getElementById('category').value = curso.category;
+            document.getElementById('title').value = curso.title;
+            document.getElementById('description').value = curso.description;
+            document.getElementById('url').value = curso.url;
+            document.getElementById('buttonText').value = curso.buttonText || "🔍 Ver Temario Completo";
+            document.getElementById('badge').value = curso.badge || "";
+            document.getElementById('image').value = curso.image;
+            
+            // 🏷️ ENLACE CON DESCUENTO: Cargamos los datos guardados en el formulario
+            document.getElementById('urlDescuento').value = curso.urlDescuento || "";
+            if (document.getElementById('buttonTextDescuento')) {
+                document.getElementById('buttonTextDescuento').value = curso.buttonTextDescuento || "";
+            }
+            
+            // 🚀 ENLACE ALTERNATIVO / MENSUAL: Cargamos los datos guardados en el formulario
+            if (document.getElementById('urlMensual')) {
+                document.getElementById('urlMensual').value = curso.urlMensual || "";
+            }
+            if (document.getElementById('buttonTextMensual')) {
+                document.getElementById('buttonTextMensual').value = curso.buttonTextMensual || "";
+            }
+            
+            // 🟢 ENLACE EXTRA: Cargamos los datos guardados en el formulario
+            if (document.getElementById('urlExtra')) {
+                document.getElementById('urlExtra').value = curso.urlExtra || "";
+            }
+            if (document.getElementById('buttonTextExtra')) {
+                document.getElementById('buttonTextExtra').value = curso.buttonTextExtra || "";
+            }
+            
+            // Evaluamos opciones avanzadas (Clases y cuotas JSON)
+            const tieneExtras = curso.tieneOpcionesExtra === true || curso.tieneOpcionesExtra === "true";
+            document.getElementById('tieneOpcionesExtra').value = tieneExtras ? "true" : "false";
+            
+            if (tieneExtras) {
+                document.getElementById('clases').value = typeof curso.clases === 'string' ? curso.clases : JSON.stringify(curso.clases, null, 2);
+                document.getElementById('preciosAlternativos').value = typeof curso.preciosAlternativos === 'string' ? curso.preciosAlternativos : JSON.stringify(curso.preciosAlternativos, null, 2);
+            } else {
+                document.getElementById('clases').value = '[{"label": "📺 Ver Clase Gratuita Día #1", "url": "https://url.com"}]';
+                document.getElementById('preciosAlternativos').value = '[\n{"label": "🔥 Oferta Flash Limitada (S/ 107 / 30$)", "url": "https://url.com"},\n{"label": "💎 Acceso Premium Full (S/ 264 / 74$)", "url": "https://url.com"}\n]';
+            }
+
+            // Forzamos la actualización de los contenedores avanzados
+            toggleExtras();
+
+            // Subimos sutilmente la pantalla para iniciar la edición
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (err) {
+            alert("Error al mapear los datos al formulario: " + err.message);
+        }
+    }
+
+    // 🗑️ FUNCIÓN GLOBAL CLÁSICA PARA ELIMINAR UN CURSO
+    async function eliminarCursoDeBD(idCurso) {
+        if (!confirm(`¿Estás seguro de que deseas eliminar el curso con ID ${idCurso}?`)) return;
+
+        try {
+            const tokenKey = 'sb-' + SUPABASE_URL.replace('https://', '').split('.') + '-auth-token';
+            const sessionData = localStorage.getItem(tokenKey);
+            let headers = { 'apikey': SUPABASE_ANON_KEY };
+            if (sessionData) {
+                const parsed = JSON.parse(sessionData);
+                headers['Authorization'] = 'Bearer ' + parsed.access_token;
+            }
+
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/cursos?id=eq.${idCurso}`, {
+                method: 'DELETE',
+                headers: headers
+            });
+
+            if (response.ok) {
+                alert("¡Curso eliminado con éxito!");
+                cargarCursosRegistrados();
+            } else {
+                alert("No se pudo eliminar el curso.");
+            }
+        } catch (err) {
+            alert("Error al intentar eliminar: " + err.message);
+        }
+    }
+
+    // Cerrar Sesión Segura
+    function cerrarSesion() {
+        supabaseClient.auth.signOut();
+        alert("Sesión cerrada.");
+    }
+</script>
+
+</body>
+</html>
+
